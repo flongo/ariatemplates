@@ -25,6 +25,8 @@
  * </ul>
  */
 
+var path = require("path");
+
 module.exports = function (grunt) {
     var atExtensions = ['**/*.js', '**/*.tpl', '**/*.tpl.css', '**/*.tpl.txt', '**/*.tml', '**/*.cml'];
 
@@ -35,7 +37,7 @@ module.exports = function (grunt) {
                 type : 'NoderBootstrapPackage',
                 cfg : {
                     header : '<%= packaging.license %>',
-                    noderModules : ['src/noder-modules/*'],
+                    noderModules : [grunt.config.get('packaging.bootstrap.aria_source_directory') + '/noder-modules/*'],
                     noderEnvironment : environment,
                     noderConfigOptions : {
                         main : mainFile,
@@ -57,8 +59,8 @@ module.exports = function (grunt) {
 
     grunt.config.set('atpackager.bootstrap', {
         options : {
-            sourceDirectories : ['src'],
-            sourceFiles : ['aria/**/*', '!aria/node.js', '!aria/bootstrap.tpl.js', '!aria/css/**'],
+            sourceDirectories : '<%= packaging.bootstrap.source_directories %>',
+            sourceFiles : ['aria/**/*', '!aria/node.js', '!aria/bootstrap.tpl.js', '!aria/css/**'].concat(grunt.config.get('packaging.bootstrap.extra_source_files')),
             outputDirectory : '<%= packaging.bootstrap.outputdir %>',
             visitors : [{
                         type : 'NoderPlugins',
@@ -70,7 +72,7 @@ module.exports = function (grunt) {
                         type : 'NoderRequiresGenerator',
                         cfg : {
                             requireFunction : "syncRequire",
-                            wrapper : "<%= grunt.file.read('src/aria/bootstrap.tpl.js') %>",
+                            wrapper : grunt.file.read(require('path').join(__dirname, '../../../src/aria/bootstrap.tpl.js')),
                             targetLogicalPath : 'aria/bootstrap.js',
                             requires : '<%= packaging.bootstrap.files %>'
                         }
@@ -78,7 +80,7 @@ module.exports = function (grunt) {
                         type : 'NoderRequiresGenerator',
                         cfg : {
                             requireFunction : "syncRequire",
-                            wrapper : "<%= grunt.file.read('src/aria/bootstrap.tpl.js') %>",
+                            wrapper : grunt.file.read(require('path').join(__dirname, '../../../src/aria/bootstrap.tpl.js')),
                             targetLogicalPath : 'aria/bootstrap-node.js',
                             requires : '<%= packaging.bootstrap.files %>'
                         }
@@ -93,7 +95,7 @@ module.exports = function (grunt) {
                             files : '<%= packaging.check_globals.files %>',
                             allowCommonJSGlobals : true,
                             allowedGlobals : ["aria", "Aria", "setTimeout", "clearTimeout", "setInterval",
-                                    "clearInterval", "global"]
+                                    "clearInterval", "global"].concat(grunt.config.get('packaging.bootstrap.extra_allowed_globals'))
                         }
                     }, {
                         type : 'JSStripBanner',
@@ -106,7 +108,7 @@ module.exports = function (grunt) {
                             files : ['aria/Aria.js'],
                             replacements : [{
                                         find : "ARIA-SNAPSHOT",
-                                        replace : '<%= pkg.version %>'
+                                        replace : '<%= aria.version %>'
                                     }]
                         }
                     }, {
@@ -124,10 +126,6 @@ module.exports = function (grunt) {
             packages : [getNoderPackage('<%= packaging.main_file %>', "aria/bootstrap.js", "browser"),
                     getNoderPackage("aria/node.js", "aria/bootstrap-node.js", "node")]
         }
-    });
-
-    grunt.config.set('removedirs.bootstrap', {
-        folders : ['<%= packaging.bootstrap.outputdir %>']
     });
 
     grunt.registerTask('bootstrap', ['atpackager:bootstrap', 'atpackager:bootstrapSkin']);

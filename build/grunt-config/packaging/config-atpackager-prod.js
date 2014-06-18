@@ -38,6 +38,7 @@ module.exports = function (grunt) {
     grunt.config.set('atpackager.prod', {
         options : {
             ATBootstrapFile : '<%= packaging.main_file %>',
+            ATAppEnvironment : '<%=packaging.prod.app_environment %>',
             sourceDirectories : ['<%= packaging.bootstrap.outputdir %>'],
             sourceFiles : ['<%= packaging.prod.source_files %>', '!<%= packaging.main_file %>'],
             defaultBuilder : {
@@ -133,14 +134,14 @@ module.exports = function (grunt) {
                         cfg : {
                             files : ['**/*'].concat(notAtExtensions)
                         }
-                    }, 'CheckPackaged'],
+                    }, grunt.config.get('packaging.prod.check_packaged') ? 'CheckPackaged' : null],
             packages : [{
                         name : '<%= packaging.main_file %>',
                         builder : {
                             type : 'NoderBootstrapPackage',
                             cfg : {
                                 header : '<%= packaging.license %>',
-                                noderModules : ['src/noder-modules/*'],
+                                noderModules : [grunt.config.get('packaging.bootstrap.aria_source_directory') + '/noder-modules/*'],
                                 noderConfigOptions : {
                                     main : "aria/bootstrap",
                                     failFast : false,
@@ -167,14 +168,6 @@ module.exports = function (grunt) {
                         files : ['aria/bootstrap.js', '<%= packaging.bootstrap.files %>']
                     }, '<%= packaging.prod.files %>', '<%= packaging.prod.expanded_localization_files %>']
         }
-    });
-
-    grunt.config.set('gzipStats.prod', {
-        src : '<%= packaging.prod.outputdir %>'
-    });
-
-    grunt.config.set('removedirs.prod', {
-        folders : ['<%= packaging.prod.outputdir %>']
     });
 
     grunt.registerTask('expandLocalizationFiles', function () {

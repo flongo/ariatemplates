@@ -21,15 +21,21 @@
 module.exports = function (grunt) {
 
     grunt.registerTask('clean', ['removedirs:bootstrap', 'removedirs:prod']);
-    grunt.registerTask('release', ['clean', 'bootstrap', 'prod', 'gzipStats:prod']);
+    grunt.registerTask('release', ['clean', 'atbuild', 'gzipStats:prod']);
     grunt.registerTask('default', ['gruntTimeHookStart', 'release', 'gruntTimeHookEnd']);
 
     grunt.loadTasks('./build/grunt-tasks');
-    grunt.loadNpmTasks('atpackager');
-    require('atpackager').loadNpmPlugin('noder-js');
-    require('atpackager').loadNpmPlugin('at-noder-converter');
     grunt.loadNpmTasks('grunt-verifylowercase');
     grunt.loadNpmTasks('grunt-leading-indent');
     grunt.loadNpmTasks('grunt-contrib-jshint');
-    grunt.loadTasks('./build/grunt-config');
+    require('./build/grunt-config/config-common')(grunt);
+    require('./build/grunt-config/config-checkStyle')(grunt);
+    require('./build/grunt-config/config-gzipstats')(grunt);
+    require('./build/grunt-config/config-removedirs')(grunt);
+
+    grunt.config.set('atbuild.default', {
+        options : {}
+    });
+    grunt.loadTasks("./tasks");
+
 };

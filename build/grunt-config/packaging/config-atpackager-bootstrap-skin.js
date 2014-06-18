@@ -19,7 +19,7 @@ module.exports = function (grunt) {
             ATDebug : true,
             ATBootstrapFile : '<%= packaging.main_file %>',
             ATDirectories : ['<%= packaging.bootstrap.outputdir %>'],
-            sourceDirectories : ['src'],
+            sourceDirectories : '<%= packaging.bootstrap.source_directories %>',
             sourceFiles : ['aria/css/**'],
             outputDirectory : '<%= packaging.bootstrap.outputdir %>',
             visitors : [{
