@@ -42,6 +42,11 @@ Aria.classDefinition({
 
             var newArray = ["d"];
             tpl.testArray = newArray;
+
+            // test the error when argument is invalid
+            tpl.changeArrayView.updateInitialArray("wrong type");
+            this.assertErrorInLogs(aria.templates.View.INVALID_TYPE_OF_ARGUMENT);
+
             tpl.changeArrayView.updateInitialArray(newArray);
             this.assertEquals(tpl.changeArrayView.items.length, newArray.length);
             this.assertEquals(tpl.changeArrayView.items[0].value, newArray[0]);
